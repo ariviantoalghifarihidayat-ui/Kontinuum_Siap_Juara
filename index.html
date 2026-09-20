@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KONTINUUM — Identity Continuity Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{
+ --teal:#00a887;--teal2:#007f69;--blue:#1677ff;--navy:#071522;--bg:#f4f8fb;
+ --text:#0f172a;--muted:#64748b;--line:#e2e8f0;--white:#fff;--danger:#dc2626;
+ --amber:#d97706;--green:#16a34a;--purple:#7c3aed;--shadow:0 14px 40px rgba(15,23,42,.10)
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif}
+body{min-height:100vh;background:radial-gradient(circle at 20% 10%,#10334b,#071522 55%,#041019);color:var(--text)}
+button,input,textarea{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.hidden{display:none!important}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;overflow:hidden}
+.login-visual{position:relative;padding:55px;display:flex;flex-direction:column;justify-content:center;color:white;overflow:hidden}
+.login-visual:before,.login-visual:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.10);border-radius:50%;pointer-events:none}
+.login-visual:before{width:650px;height:650px;left:-250px;top:-120px}
+.login-visual:after{width:480px;height:480px;right:-200px;bottom:-190px}
+.login-brand{position:absolute;top:32px;left:42px;display:flex;align-items:center;gap:12px}
+.logo-svg{width:48px;height:48px;filter:drop-shadow(0 8px 18px rgba(0,168,135,.25))}
+.login-brand b{font-size:20px;letter-spacing:.03em}.login-brand small{display:block;font-size:8px;letter-spacing:.14em;opacity:.65}
+.login-copy{position:relative;z-index:2;max-width:570px}
+.eyebrow{display:inline-flex;gap:7px;align-items:center;padding:7px 10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.1em}
+.login-copy h1{font-size:clamp(38px,5vw,70px);line-height:1.03;margin:20px 0 15px}
+.login-copy h1 span{background:linear-gradient(90deg,#6fffd8,#6ea9ff);-webkit-background-clip:text;color:transparent}
+.login-copy p{max-width:500px;font-size:13px;line-height:1.75;color:#c8d6e2}
+.login-points{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}
+.login-points span{font-size:9px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09)}
+.mascot-wrap{position:absolute;right:8%;bottom:7%;width:190px;z-index:2;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.mascot-svg{width:100%;height:auto;filter:drop-shadow(0 18px 30px rgba(0,0,0,.35))}
+.login-panel{background:#f7fafc;display:flex;align-items:center;justify-content:center;padding:35px}
+.login-card{width:min(430px,100%);background:white;border:1px solid var(--line);border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.18)}
+.login-card .mini-logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,#00a887,#1677ff);display:grid;place-items:center;margin-bottom:18px}
+.login-card h2{font-size:26px}.login-card p{font-size:11px;color:var(--muted);line-height:1.6;margin:7px 0 23px}
+.field{margin-bottom:13px}.field label{display:block;font-size:9px;font-weight:800;margin-bottom:6px;color:#475569}
+.input-wrap{position:relative}.input-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;width:16px}
+.input{width:100%;border:1px solid var(--line);border-radius:13px;padding:12px 13px 12px 37px;outline:none;font-size:11px;background:#fbfdff}
+.input:focus{border-color:#8bded0;box-shadow:0 0 0 4px rgba(0,168,135,.08)}
+.checkline{display:flex;gap:8px;align-items:flex-start;font-size:9px;color:var(--muted);line-height:1.5;margin:12px 0 18px}
+.primary{width:100%;border:0;border-radius:13px;padding:13px;background:linear-gradient(135deg,#00a887,#1677ff);color:#fff;font-size:11px;font-weight:800;box-shadow:0 10px 22px rgba(0,128,105,.18)}
+.demo{margin-top:10px;width:100%;border:1px solid var(--line);border-radius:13px;padding:11px;background:#f8fafc;color:#334155;font-size:10px;font-weight:800}
+.login-note{text-align:center;color:#94a3b8;font-size:8px;margin-top:16px}
+
+/* APP */
+.app{width:100%;min-height:100vh;background:var(--bg);display:flex;position:relative;overflow:hidden}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;justify-content:space-between;flex:none}
+.brand{padding:4px 10px 19px;border-bottom:1px solid #eef2f7;margin-bottom:18px;display:flex;gap:10px;align-items:center}
+.brandmark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--teal),var(--blue));display:grid;place-items:center;color:#fff;flex:none}
+.brand h1{font-size:18px}.brand p{font-size:7px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.menu button{width:100%;border:0;background:transparent;padding:12px 14px;border-radius:12px;display:flex;gap:11px;align-items:center;color:#64748b;font-weight:700;font-size:11px;margin-bottom:5px;text-align:left}
+.menu button.active,.menu button:hover{background:linear-gradient(90deg,#e8faf6,#edf6ff);color:var(--teal2)}
+.userbox{padding:12px;border-radius:15px;background:#f8fafc;display:flex;align-items:center;gap:9px}
+.avatar{width:35px;height:35px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#2563eb);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800}
+.userbox b{font-size:10px}.userbox small{display:block;font-size:8px;color:var(--muted);margin-top:2px}
+.logout{margin-left:auto;border:0;background:transparent;color:#94a3b8;padding:5px}.main{flex:1;min-width:0;overflow:auto;padding:23px}
+.top{background:linear-gradient(135deg,#008d74,#1268a8);color:#fff;border-radius:22px;padding:22px 24px;margin-bottom:19px;position:relative;overflow:hidden}
+.top:after{content:'';position:absolute;width:250px;height:250px;border:1px solid rgba(255,255,255,.16);border-radius:50%;right:-75px;top:-110px}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:15px;position:relative;z-index:1}
+.welcome h2{font-size:22px}.welcome p{font-size:10px;opacity:.82;margin-top:5px}
+.status{background:rgba(255,255,255,.14);padding:8px 11px;border-radius:12px;font-size:9px;font-weight:800;display:flex;gap:6px;align-items:center}
+.dot{width:7px;height:7px;background:#7fffd4;border-radius:50%;box-shadow:0 0 0 4px rgba(127,255,212,.12)}
+.search{margin-top:17px;background:#fff;border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:8px;color:#94a3b8;position:relative;z-index:2}
+.search input{border:0;outline:0;flex:1;font-size:10px}.search button{border:0;background:#eef7f5;color:var(--teal2);border-radius:9px;padding:7px 10px;font-size:9px;font-weight:800}
+.view{display:none}.view.active{display:block}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px}.section-head h3{font-size:14px}.section-head span{font-size:9px;color:var(--teal2);font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:0 3px 10px rgba(15,23,42,.03);transition:.2s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.card.clickable{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}.icon{width:35px;height:35px;border-radius:10px;display:grid;place-items:center;margin-bottom:10px}
+.teal{background:#e6f7f3;color:var(--teal2)}.blue{background:#eaf2ff;color:#2563eb}.amber{background:#fff7e6;color:#d97706}.purple{background:#f1edff;color:#7c3aed}.red{background:#fff0f0;color:#b91c1c}
+.card h4{font-size:11px;margin-bottom:4px}.card p{font-size:9px;color:var(--muted);line-height:1.5}
+.hero-grid{display:grid;grid-template-columns:1.45fr .8fr;gap:13px}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px}.panel h3{font-size:13px}.panel p{font-size:9px;color:var(--muted);line-height:1.55}
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.metric{background:#f8fafc;border-radius:12px;padding:11px}.metric b{font-size:18px}.metric small{display:block;color:var(--muted);font-size:8px;margin-top:2px}
+.timeline{margin-top:14px;display:flex;flex-direction:column;gap:10px}.event{display:flex;gap:9px;align-items:flex-start}.event-dot{width:26px;height:26px;border-radius:9px;background:#e8faf6;color:var(--teal2);display:grid;place-items:center;flex:none}.event b{font-size:9px}.event span{display:block;color:var(--muted);font-size:8px;margin-top:2px}
+.progress{height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:10px}.progress>i{display:block;height:100%;width:78%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:99px}
+.verify{display:grid;grid-template-columns:1fr .9fr;gap:13px}.textarea{width:100%;height:130px;border:1px solid var(--line);border-radius:14px;padding:13px;resize:none;outline:0;font-size:10px;margin:12px 0}
+.btn{border:0;border-radius:11px;background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;padding:10px 14px;font-weight:800;font-size:9px}
+.btn.secondary{background:#eef2f7;color:#334155}.btn.danger{background:#fff0f0;color:var(--danger);border:1px solid #fecaca}
+.result{display:none;margin-top:12px;border-radius:13px;padding:13px;background:#f8fafc;border:1px solid var(--line);font-size:9px;line-height:1.6}.result.show{display:block}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 8px;font-size:8px;font-weight:800}.badge.green{background:#eaf8ef;color:#15803d}.badge.amber{background:#fff6df;color:#a16207}.badge.red{background:#fff0f0;color:#b91c1c}.sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.source{font-size:8px;padding:6px 8px;background:#f8fafc;border:1px solid var(--line);border-radius:8px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.step{background:#fff;border:1px solid var(--line);padding:11px;border-radius:12px;cursor:pointer}.step:hover{border-color:#8bded0;background:#f9fffd}.step strong{display:block;font-size:9px}.step span{font-size:8px;color:var(--muted)}
+.incident{border:1px solid #fed7aa;background:linear-gradient(135deg,#fffaf2,#fff);border-radius:18px;padding:18px}.incident h3{font-size:14px}.incident p{font-size:9px;color:var(--muted);margin:5px 0 13px}
+.cert{border:2px solid #b8e8df;border-radius:18px;padding:17px;background:linear-gradient(135deg,#f8fffd,#fff)}.cert-head{display:flex;justify-content:space-between;gap:10px}.cert-id{font-size:8px;color:var(--muted);font-family:monospace}.cert h3{font-size:16px;margin-top:6px}.cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.cert-item{background:#fff;border:1px solid var(--line);padding:10px;border-radius:10px}.cert-item small{display:block;color:var(--muted);font-size:7px}.cert-item b{font-size:9px}.cert p{font-size:9px;color:#475569;line-height:1.6}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eef2f7}.toggle-row:last-child{border-bottom:0}.toggle-row b{font-size:10px}.toggle-row span{display:block;font-size:8px;color:var(--muted);margin-top:2px}.toggle{width:40px;height:22px;border:0;border-radius:99px;background:#cbd5e1;position:relative}.toggle.on{background:var(--teal)}.toggle:after{content:'';width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.2s}.toggle.on:after{left:21px}
+.profile-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:13px}.profile-card{text-align:center}.profile-big{width:75px;height:75px;border-radius:25px;margin:0 auto 12px;background:linear-gradient(135deg,#0d9488,#2563eb);color:#fff;display:grid;place-items:center;font-size:25px;font-weight:800}
+.mascot-card{display:flex;gap:15px;align-items:center}.mascot-small{width:95px}.mascot-small svg{width:100%}
+.toast{position:fixed;right:22px;bottom:22px;background:#0f172a;color:#fff;padding:11px 14px;border-radius:12px;font-size:9px;box-shadow:0 15px 35px rgba(0,0,0,.25);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s;z-index:50}.toast.show{opacity:1;transform:translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(7,21,34,.58);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}.modal.show{display:flex}.modal-card{background:#fff;width:min(530px,100%);border-radius:20px;padding:20px;box-shadow:0 25px 60px rgba(0,0,0,.25)}.modal-card h3{font-size:15px;margin-bottom:7px}.modal-card p{font-size:9px;color:var(--muted);line-height:1.65}.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px}
+.mobile-nav{display:none}
+@media(max-width:1000px){.login-screen{grid-template-columns:1fr}.login-visual{display:none}.login-panel{min-height:100vh}.sidebar{display:none}.main{padding:15px 15px 85px}.grid{grid-template-columns:repeat(2,1fr)}.hero-grid,.verify,.profile-grid{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,1fr)}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:68px;background:#fff;border-top:1px solid var(--line);z-index:30}.mobile-nav button{flex:1;border:0;background:#fff;color:#94a3b8;font-size:8px;font-weight:800;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center}.mobile-nav button.active{color:var(--teal2)}.top{padding:18px}.welcome h2{font-size:19px}.metric-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:500px){.login-card{padding:24px}.toprow{align-items:flex-start}.status{font-size:7px}.grid{gap:8px}.card{padding:12px}.metric b{font-size:15px}.cert-grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}}
+
+.logo-slot{width:48px;height:48px;border:1.5px dashed rgba(255,255,255,.45);border-radius:14px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.05);flex:none}
+.logo-slot img,.brand-logo-slot img,.mini-logo-placeholder img,.cert-logo-slot img{width:100%;height:100%;object-fit:contain}
+.logo-slot span,.brand-logo-slot,.mini-logo-placeholder,.cert-logo-slot{font-size:7px;font-weight:800;letter-spacing:.08em;text-align:center}
+.mascot-slot{width:190px;height:220px;border:1.5px dashed rgba(255,255,255,.3);border-radius:28px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#fff;text-align:center}
+.mascot-slot img{width:170px;height:190px;object-fit:contain;display:none}
+.mascot-slot.has-image img{display:block}.mascot-slot.has-image>div{display:none}
+.mascot-slot b{font-size:12px;letter-spacing:.15em}.mascot-slot small{font-size:7px;opacity:.65;display:block;margin-top:4px}
+.mascot-slot.compact{width:95px;height:110px;border-color:#dbe5ee;background:#f8fafc;color:#64748b;border-radius:18px}
+.mascot-slot.compact img{width:82px;height:92px}
+.mini-logo-placeholder{width:39px;height:39px;border:1px dashed rgba(255,255,255,.7);display:grid;place-items:center;color:#fff;border-radius:8px}
+.brand-logo-slot{width:28px;height:28px;border:1px dashed rgba(255,255,255,.7);display:grid;place-items:center;color:#fff;border-radius:7px}
+.cert-logo-slot{font-size:7px;display:grid;place-items:center}
+@media(max-width:1000px){
+ .login-panel{padding:18px}
+ .login-card{max-width:470px}
+ .main{padding:12px 12px 86px}
+ .top{border-radius:17px}
+ .toprow{gap:8px}
+ .welcome p{max-width:520px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero-grid,.verify,.profile-grid{grid-template-columns:1fr}
+ .mobile-nav button{min-width:0}
+}
+@media(max-width:600px){
+ .login-card{padding:20px;border-radius:20px}
+ .login-card h2{font-size:22px}
+ .login-card p{font-size:10px}
+ .field label{font-size:8px}
+ .input{font-size:10px}
+ .primary,.demo{font-size:10px}
+ .toprow{display:block}
+ .status{display:inline-flex;margin-top:10px}
+ .search{margin-top:12px}
+ .search button{padding:7px 8px}
+ .section-head{margin:15px 0 9px}
+ .section-head h3{font-size:12px}
+ .card{min-width:0}
+ .card h4{font-size:10px}
+ .card p{font-size:8px}
+ .metric-row{gap:5px}
+ .metric{padding:9px}
+ .metric b{font-size:14px}
+ .metric small{font-size:7px}
+ .steps{grid-template-columns:1fr 1fr}
+ .step{padding:9px}
+ .step strong{font-size:8px}
+ .step span{font-size:7px}
+ .cert-grid{grid-template-columns:1fr}
+ .modal{padding:12px}
+ .modal-card{padding:16px;border-radius:16px}
+ .modal-actions .btn{width:100%}
+ .modal-actions{display:block}
+ .mascot-slot.compact{width:75px;height:88px}
+ .mascot-slot.compact img{width:65px;height:74px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="loginScreen" class="login-screen">
+  <div class="login-visual">
+    <div class="login-brand">
+      <div class="logo-slot" title="Upload logo KONTINUUM dari GitHub Assets">
+  <img id="continuumLogo" src="" alt="Logo KONTINUUM">
+  <span>LOGO<br>ASSET</span>
+</div>
+      <div><b>KONTINUUM</b><small>IDENTITY CONTINUITY PROTOCOL</small></div>
+    </div>
+    <div class="login-copy">
+      <span class="eyebrow">◉ TRUST BEFORE INCIDENT</span>
+      <h1>Identitas tetap <span>terhubung</span> dari waktu ke waktu.</h1>
+      <p>Kontinuum membangun jejak kontinuitas identitas melalui attestasi berkala, multi-source provenance, incident trigger, contradiction report, dan continuity certificate.</p>
+      <div class="login-points"><span>🔐 Privacy-by-Design</span><span>◎ Selective Disclosure</span><span>✓ Bounded Claim</span></div>
+    </div>
+    <div class="mascot-wrap">
+      <div class="mascot-slot">
+        <img id="continuumMascot" src="" alt="Maskot Kontinuum">
+        <div><b>MASKOT</b><small>ASSET SPACE</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="login-panel">
+    <form class="login-card" onsubmit="login(event)">
+      <div class="mini-logo">
+        <div class="mini-logo-placeholder">LOGO</div>
+      </div>
+      <h2>Masuk ke Kontinuum</h2>
+      <p>Mulai dari identitas Anda. Semua fitur prototype dapat dijelajahi setelah login.</p>
+      <div class="field"><label>NAMA PENGGUNA</label><div class="input-wrap"><i data-lucide="user"></i><input class="input" id="loginName" value="Ghifari" placeholder="Nama Anda"></div></div>
+      <div class="field"><label>EMAIL</label><div class="input-wrap"><i data-lucide="mail"></i><input class="input" id="loginEmail" value="ghifari@kontinuum.demo" type="email" placeholder="nama@email.com"></div></div>
+      <label class="checkline"><input id="agree" type="checkbox" checked> Saya memahami bahwa ini adalah prototype simulasi dan tidak menghubungkan data identitas nyata.</label>
+      <button class="primary" type="submit">Masuk & Jelajahi Kontinuum →</button>
+      <button class="demo" type="button" onclick="demoLogin()">Gunakan Mode Demo</button>
+      <div class="login-note">KONTINUITAS IDENTITAS, KEPERCAYAAN TERJAGA</div>
+    </form>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app" class="app hidden">
+<aside class="sidebar">
+  <div>
+    <div class="brand">
+      <div class="brandmark">
+        <span class="brand-logo-slot">LOGO</span>
+      </div>
+      <div><h1>Kontinuum</h1><p>Identity Continuity Protocol</p></div>
+    </div>
+    <div class="menu">
+      <button class="active" onclick="tab('home',this)"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+      <button onclick="tab('attest',this)"><i data-lucide="fingerprint"></i> Attestasi</button>
+      <button onclick="tab('incident',this)"><i data-lucide="triangle-alert"></i> Incident Trigger</button>
+      <button onclick="tab('certificate',this)"><i data-lucide="badge-check"></i> Sertifikat</button>
+      <button onclick="tab('privacy',this)"><i data-lucide="shield-check"></i> Privacy</button>
+      <button onclick="tab('profile',this)"><i data-lucide="user-round"></i> Profil</button>
+    </div>
+  </div>
+  <div class="userbox"><div class="avatar" id="sideAvatar">G</div><div><b id="sideName">Ghifari</b><small>Identity active</small></div><button class="logout" onclick="logout()" title="Keluar"><i data-lucide="log-out"></i></button></div>
+</aside>
+
+<main class="main">
+<header class="top">
+  <div class="toprow">
+    <div class="welcome"><h2 id="greeting">Halo, Ghifari.</h2><p>Kontinuitas identitas Anda sedang dipantau secara privacy-by-design.</p></div>
+    <div class="status"><i class="dot"></i> PROTOKOL AKTIF</div>
+  </div>
+  <div class="search"><i data-lucide="search" style="width:15px"></i><input id="search" placeholder="Cari fitur atau uji sebuah klaim..." onkeydown="if(event.key==='Enter')searchApp()"><button onclick="searchApp()">Periksa</button></div>
+</header>
+
+<section id="home" class="view active">
+  <div class="hero-grid">
+    <div class="panel">
+      <h3>Identity Continuity Status</h3><p style="margin-top:4px">Jejak bukti dibangun sebelum insiden agar pemeriksaan tidak hanya bergantung pada deteksi setelah konten beredar.</p>
+      <div class="metric-row"><div class="metric"><b id="attestCount">24</b><small>Attestations</small></div><div class="metric"><b>4</b><small>Sources</small></div><div class="metric"><b id="coverage">78%</b><small>Coverage</small></div></div>
+      <div style="font-size:8px;color:#64748b;display:flex;justify-content:space-between;margin-top:14px"><span>Continuity coverage</span><b id="coverageText">78%</b></div><div class="progress"><i id="coverageBar"></i></div>
+      <div class="section-head" style="margin-top:17px"><h3>Quick Actions</h3><span>Semua dapat diuji</span></div>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card clickable" onclick="tab('attest')"><div class="icon teal"><i data-lucide="plus"></i></div><h4>Buat Attestasi</h4><p>Tambahkan bukti kontinuitas.</p></div>
+        <div class="card clickable" onclick="tab('incident')"><div class="icon amber"><i data-lucide="siren"></i></div><h4>Uji Klaim</h4><p>Aktifkan incident trigger.</p></div>
+        <div class="card clickable" onclick="tab('certificate')"><div class="icon purple"><i data-lucide="badge-check"></i></div><h4>Lihat Sertifikat</h4><p>Buka evidence package.</p></div>
+      </div>
+    </div>
+    <div class="panel"><h3>Privacy-by-Design</h3><p style="margin-top:5px">Ledger menyimpan komitmen kriptografis minimum. Data mentah tetap pada sumbernya.</p>
+      <div class="sources"><span class="source">🔐 Minimal-data</span><span class="source">✓ Consent</span><span class="source">◎ Selective disclosure</span></div>
+      <div class="mascot-card" style="margin-top:18px">
+        <div class="mascot-small"><div class="mascot-slot compact"><img id="dashboardMascot" src="" alt="Maskot Kontinuum"><span>MASKOT</span></div></div>
+        <div><b style="font-size:11px">Konti</b><p style="margin-top:4px">Maskot penjaga jejak kontinuitas: selalu menghubungkan bukti, waktu, dan identitas.</p><button class="btn secondary" style="margin-top:8px" onclick="show('Tentang Konti','Konti adalah maskot konseptual Kontinuum. Bentuknya menyerupai simpul yang menjaga kesinambungan identitas dari satu attestasi ke attestasi berikutnya.')">Tentang maskot</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head"><h3>Core Protocol</h3><span>4 lapisan</span></div>
+  <div class="grid">
+    <div class="card clickable" onclick="tab('attest')"><div class="icon teal"><i data-lucide="fingerprint"></i></div><h4>Attestasi Berkala</h4><p>Membentuk bukti kontinuitas dari perangkat & institusi yang diizinkan.</p></div>
+    <div class="card clickable" onclick="tab('incident')"><div class="icon amber"><i data-lucide="siren"></i></div><h4>Incident Trigger</h4><p>Aktifkan ketika representasi digital diduga tidak sesuai.</p></div>
+    <div class="card clickable" onclick="openReportFromHome()"><div class="icon blue"><i data-lucide="git-compare-arrows"></i></div><h4>Contradiction Report</h4><p>Temukan ketidaksesuaian tanpa otomatis memvonis konten.</p></div>
+    <div class="card clickable" onclick="tab('certificate')"><div class="icon purple"><i data-lucide="badge-check"></i></div><h4>Sertifikat Kontinuitas</h4><p>Kemas bukti terstruktur untuk platform atau mekanisme sengketa.</p></div>
+  </div>
+
+  <div class="section-head"><h3>Aktivitas Terbaru</h3><span>Live prototype</span></div>
+  <div class="panel"><div class="timeline" id="timeline">
+    <div class="event"><div class="event-dot"><i data-lucide="check"></i></div><div><b>Attestasi institusional berhasil</b><span>Universitas • 20 Sep 2026, 09:42</span></div></div>
+    <div class="event"><div class="event-dot"><i data-lucide="smartphone"></i></div><div><b>Device attestation diperbarui</b><span>Perangkat utama • 20 Sep 2026, 09:30</span></div></div>
+    <div class="event"><div class="event-dot"><i data-lucide="clock-3"></i></div><div><b>Temporal commitment tercatat</b><span>Ledger • 20 Sep 2026, 09:00</span></div></div>
+  </div></div>
+</section>
+
+<section id="attest" class="view">
+  <div class="section-head"><h3>Attestasi Kontinuitas</h3><span>Consent-based</span></div>
+  <div class="panel">
+    <h3>Bangun jejak bukti sebelum insiden</h3><p style="margin-top:5px">Pilih sumber yang Anda izinkan. Prototype ini mensimulasikan pencatatan commitment, bukan menyimpan lokasi atau biometrik mentah.</p>
+    <div class="steps">
+      <div class="step" onclick="show('Device Attestation','Perangkat terpercaya membuat commitment terhadap keadaan perangkat pada waktu tertentu. Data mentah tetap di sumber.')"><strong>01 · Device</strong><span>Perangkat terpercaya</span></div>
+      <div class="step" onclick="show('Institution Attestation','Institusi yang diizinkan dapat memberikan attestasi keberadaan atau aktivitas tertentu tanpa membuka seluruh data mentah.')"><strong>02 · Institution</strong><span>Kampus/lembaga</span></div>
+      <div class="step" onclick="show('Timestamp','Temporal commitment mengikat bukti pada jendela waktu sehingga perubahan setelah kejadian dapat dibandingkan.')"><strong>03 · Timestamp</strong><span>Waktu terverifikasi</span></div>
+      <div class="step" onclick="show('Ledger Commitment','Ledger menerima commitment/hash minimum sebagai jejak integritas, bukan gudang data pribadi.')"><strong>04 · Ledger</strong><span>Hash commitment</span></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="addAttestation()">+ Buat Attestasi Sekarang</button><button class="btn secondary" onclick="show('Consent & Data Minimization','Attestasi hanya aktif setelah persetujuan. Data mentah tetap pada sumber dan ledger menerima commitment minimum.')">Lihat kebijakan</button></div>
+    <div id="attestResult" class="result"></div>
+  </div>
+</section>
+
+<section id="incident" class="view">
+  <div class="incident">
+    <h3><i data-lucide="triangle-alert" style="width:18px;vertical-align:-4px;color:#d97706"></i> Incident Trigger</h3>
+    <p>Gunakan ketika video/audio/gambar mengklaim sesuatu yang Anda yakini tidak sesuai dengan kontinuitas Anda.</p>
+    <label style="font-size:8px;font-weight:800">KLAIM DALAM KONTEN</label>
+    <textarea class="textarea" id="claim" placeholder="Contoh: Video mengklaim saya berada di lokasi A pada 10:00 dan membuat pernyataan tertentu."></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="generateReport()">Analisis Kontradiksi</button><button class="btn secondary" onclick="fillExample()">Isi contoh</button><button class="btn secondary" onclick="clearClaim()">Bersihkan</button></div>
+    <div id="report" class="result"></div>
+  </div>
+</section>
+
+<section id="certificate" class="view">
+  <div class="section-head"><h3>Sertifikat Kontinuitas</h3><span>Bounded claim</span></div>
+  <div class="cert">
+    <div class="cert-head"><div><span class="badge green">✓ Evidence package ready</span><h3>Continuity Certificate</h3><div class="cert-id" id="certId">KNT-2026-09-20-7A4F91</div></div><div class="brandmark cert-logo-slot">LOGO</div></div>
+    <div class="cert-grid"><div class="cert-item"><small>IDENTITY COMMITMENT</small><b>did:key:z6Mk…A91</b></div><div class="cert-item"><small>TIME WINDOW</small><b>20 Sep 2026 · 09:00–10:30</b></div><div class="cert-item"><small>ATTESTATION SOURCES</small><b id="certSources">4 independent sources</b></div><div class="cert-item"><small>CONTRADICTION</small><b style="color:#a16207" id="certConflict">Detected · Review required</b></div></div>
+    <p><b>Bounded claim:</b> sertifikat menunjukkan bahwa bukti kontinuitas tertentu tersedia dan memiliki hubungan dengan klaim yang diuji. Sertifikat <b>tidak</b> otomatis menyatakan bahwa seluruh konten adalah palsu.</p>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn" onclick="showCertificatePreview()">Preview Paket</button><button class="btn secondary" onclick="show('Selective Disclosure','Hanya field yang relevan yang dibagikan. Data mentah tetap berada pada sumber. Dalam implementasi nyata, selective disclosure dapat memakai mekanisme kriptografis/ZKP.')">Selective Disclosure</button><button class="btn secondary" onclick="downloadCertificate()">Export Demo</button></div>
+  </div>
+</section>
+
+<section id="privacy" class="view">
+  <div class="section-head"><h3>Privacy & Trust Controls</h3><span>Pengguna memegang kontrol</span></div>
+  <div class="profile-grid">
+    <div class="panel">
+      <h3>Kontrol persetujuan</h3>
+      <div class="toggle-row"><div><b>Attestasi berkala</b><span>Izinkan pembuatan commitment.</span></div><button class="toggle on" onclick="toggleControl(this,'Attestasi berkala')"></button></div>
+      <div class="toggle-row"><div><b>Institution source</b><span>Gunakan sumber institusional.</span></div><button class="toggle on" onclick="toggleControl(this,'Institution source')"></button></div>
+      <div class="toggle-row"><div><b>Selective disclosure</b><span>Bagikan field minimum.</span></div><button class="toggle on" onclick="toggleControl(this,'Selective disclosure')"></button></div>
+      <div class="toggle-row"><div><b>Incident notification</b><span>Simulasi notifikasi saat konflik terdeteksi.</span></div><button class="toggle" onclick="toggleControl(this,'Incident notification')"></button></div>
+    </div>
+    <div class="panel">
+      <h3>Prinsip Kontinuum</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="card clickable" onclick="show('Voluntary Consent','Pengguna menentukan apakah dan seberapa jauh attestasi dibangun.')"><div class="icon teal"><i data-lucide="user-check"></i></div><h4>Voluntary Consent</h4><p>Pengguna menentukan izin.</p></div>
+        <div class="card clickable" onclick="show('Minimal Data','Ledger tidak menjadi gudang lokasi, wajah, atau suara mentah.')"><div class="icon blue"><i data-lucide="database-zap"></i></div><h4>Minimal Data</h4><p>Data mentah tetap di sumber.</p></div>
+        <div class="card clickable" onclick="show('Multi-Source','Perangkat, institusi, timestamp, dan sumber lain dapat saling menguatkan.')"><div class="icon amber"><i data-lucide="network"></i></div><h4>Multi-Source</h4><p>Bukti tidak bergantung satu sumber.</p></div>
+        <div class="card clickable" onclick="show('Bounded Claim','Sertifikat menyatakan apa yang didukung bukti, bukan vonis otomatis.')"><div class="icon purple"><i data-lucide="scale"></i></div><h4>Bounded Claim</h4><p>Klaim dibatasi bukti.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="profile" class="view">
+  <div class="section-head"><h3>Profil & Identitas</h3><span>Demo account</span></div>
+  <div class="profile-grid">
+    <div class="panel profile-card">
+      <div class="profile-big" id="profileAvatar">G</div><h3 id="profileName">Ghifari</h3><p id="profileEmail">ghifari@kontinuum.demo</p>
+      <button class="btn secondary" style="margin-top:13px" onclick="editProfile()">Edit profil</button>
+    </div>
+    <div class="panel">
+      <h3>Identity Continuity Profile</h3>
+      <div class="cert-grid">
+        <div class="cert-item"><small>STATUS</small><b>Active</b></div>
+        <div class="cert-item"><small>ATTESTATIONS</small><b id="profileAttest">24</b></div>
+        <div class="cert-item"><small>TRUST SOURCES</small><b>4 sources</b></div>
+        <div class="cert-item"><small>PRIVACY MODE</small><b>Minimal-data</b></div>
+      </div>
+      <button class="btn" onclick="show('Identity Commitment','Identitas direpresentasikan sebagai commitment demo. Prototype tidak membuat DID atau kredensial nyata.')">Lihat identity commitment</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="mobile-nav">
+<button class="active" onclick="tab('home',this)"><i data-lucide="layout-dashboard"></i>Home</button>
+<button onclick="tab('attest',this)"><i data-lucide="fingerprint"></i>Attest</button>
+<button onclick="tab('incident',this)"><i data-lucide="siren"></i>Incident</button>
+<button onclick="tab('certificate',this)"><i data-lucide="badge-check"></i>Cert</button>
+<button onclick="tab('privacy',this)"><i data-lucide="shield-check"></i>Privacy</button>
+</nav>
+</div>
+
+<div class="modal" id="modal"><div class="modal-card"><h3 id="modalTitle"></h3><p id="modalBody"></p><div class="modal-actions"><button class="btn secondary" onclick="closeModal()">Tutup</button></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+lucide.createIcons();
+
+const state={
+ user:localStorage.getItem('kontinuum_user')||'Ghifari',
+ email:localStorage.getItem('kontinuum_email')||'ghifari@kontinuum.demo',
+ attestations:Number(localStorage.getItem('kontinuum_attestations')||24),
+ loggedIn:localStorage.getItem('kontinuum_logged')==='1'
+};
+
+function init(){
+  if(state.loggedIn) openApp(); else showLogin();
+  refreshUser();
+}
+function showLogin(){document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('app').classList.add('hidden');}
+function openApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');refreshUser();lucide.createIcons();}
+function login(e){
+ e.preventDefault();
+ const name=document.getElementById('loginName').value.trim()||'Ghifari';
+ const email=document.getElementById('loginEmail').value.trim()||'ghifari@kontinuum.demo';
+ if(!document.getElementById('agree').checked){show('Persetujuan diperlukan','Centang persetujuan prototype terlebih dahulu.');return;}
+ state.user=name;state.email=email;state.loggedIn=true;
+ localStorage.setItem('kontinuum_user',name);localStorage.setItem('kontinuum_email',email);localStorage.setItem('kontinuum_logged','1');
+ openApp();toast('Selamat datang di Kontinuum, '+name+'!');
+}
+function demoLogin(){document.getElementById('loginName').value='Ghifari';document.getElementById('loginEmail').value='ghifari@kontinuum.demo';document.getElementById('agree').checked=true;document.querySelector('.login-card').requestSubmit();}
+function logout(){state.loggedIn=false;localStorage.setItem('kontinuum_logged','0');showLogin();toast('Anda telah keluar dari prototype.');}
+function refreshUser(){
+ const first=(state.user||'G')[0].toUpperCase();
+ ['sideAvatar','profileAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=first});
+ ['sideName','profileName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=state.user});
+ const gr=document.getElementById('greeting');if(gr)gr.textContent='Halo, '+state.user+'.';
+ const em=document.getElementById('profileEmail');if(em)em.textContent=state.email;
+ ['attestCount','profileAttest'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=state.attestations});
+}
+function tab(id,el){
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+ const target=document.getElementById(id);if(target)target.classList.add('active');
+ document.querySelectorAll('.menu button,.mobile-nav button').forEach(x=>x.classList.remove('active'));
+ if(el)el.classList.add('active');
+ else{
+   const map={home:'dashboard',attest:'attestasi',incident:'incident',certificate:'sertifikat',privacy:'privacy',profile:'profil'};
+   const b=[...document.querySelectorAll('.menu button')].find(x=>x.textContent.toLowerCase().includes(map[id]));
+   if(b)b.classList.add('active');
+ }
+ lucide.createIcons();
+}
+function show(t,b){document.getElementById('modalTitle').textContent=t;document.getElementById('modalBody').textContent=b;document.getElementById('modal').classList.add('show');}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+function addAttestation(){
+ state.attestations++;localStorage.setItem('kontinuum_attestations',state.attestations);refreshUser();
+ const coverage=Math.min(99,78+Math.floor((state.attestations-24)*.7));
+ document.getElementById('coverage').textContent=coverage+'%';document.getElementById('coverageText').textContent=coverage+'%';document.getElementById('coverageBar').style.width=coverage+'%';
+ const box=document.getElementById('attestResult');box.className='result show';
+ box.innerHTML='<span class="badge green">✓ Attestation created</span><div style="margin-top:7px"><b>Commitment:</b> 0x7f9a…c21d<br><b>Timestamp:</b> 20 Sep 2026, '+new Date().toLocaleTimeString('id-ID')+'<br><b>Source:</b> Trusted device<br><b>Raw data:</b> retained at source</div>';
+ addTimeline('Attestasi baru berhasil dibuat','Trusted device • '+new Date().toLocaleTimeString('id-ID'));
+ toast('Attestasi baru berhasil dibuat.');
+}
+function addTimeline(title,meta){
+ const t=document.getElementById('timeline');const d=document.createElement('div');d.className='event';
+ d.innerHTML='<div class="event-dot"><i data-lucide="check"></i></div><div><b>'+title+'</b><span>'+meta+'</span></div>';
+ t.prepend(d);lucide.createIcons();
+}
+function fillExample(){document.getElementById('claim').value='Video mengklaim saya berada di lokasi A pada pukul 10.00, sedangkan attestasi institusional menunjukkan saya berada di lokasi B.';toast('Contoh klaim dimasukkan.');}
+function clearClaim(){document.getElementById('claim').value='';document.getElementById('report').className='result';toast('Kolom klaim dibersihkan.');}
+function generateReport(){
+ const claim=document.getElementById('claim').value.trim();
+ if(!claim){tab('incident');document.getElementById('claim').focus();show('Klaim belum diisi','Masukkan klaim dari video, audio, gambar, atau unggahan yang ingin diuji.');return;}
+ const box=document.getElementById('report');box.className='result show';
+ box.innerHTML=`<span class="badge amber">⚠ Contradiction detected — review required</span><div style="margin-top:8px"><b>Temporal match:</b> available<br><b>Institutional attestation:</b> conflicting with claimed location/time<br><b>Device attestation:</b> consistent with institutional record<br><b>ZKP:</b> eligible for selective disclosure</div><div class="sources"><span class="source">Device ✓</span><span class="source">Institution ✓</span><span class="source">Timestamp ✓</span><span class="source">Content claim ⚠</span></div><button class="btn" style="margin-top:10px" onclick="tab('certificate')">Buat Sertifikat Kontinuitas</button>`;
+ document.getElementById('certConflict').textContent='Detected · Review required';
+ addTimeline('Contradiction report dibuat','Incident trigger • '+new Date().toLocaleTimeString('id-ID'));
+ toast('Kontradiksi terdeteksi. Review diperlukan.');
+}
+function openReportFromHome(){tab('incident');fillExample();generateReport();}
+function searchApp(){
+ const q=document.getElementById('search').value.trim();
+ if(!q){show('Pencarian','Ketik klaim atau kata seperti “deepfake”, “attestasi”, “privacy”, atau “sertifikat”.');return;}
+ const map=[['attestasi','attest'],['privacy','privacy'],['sertifikat','certificate'],['profil','profile'],['deepfake','incident'],['klaim','incident']];
+ const hit=map.find(x=>q.toLowerCase().includes(x[0]));
+ if(hit){tab(hit[1]);if(hit[1]==='incident'){document.getElementById('claim').value='Pemeriksaan klaim: '+q;generateReport();}}
+ else{tab('incident');document.getElementById('claim').value='Pemeriksaan klaim: '+q;generateReport();}
+}
+function showCertificatePreview(){
+ show('Certificate Preview','Paket bukti demo berisi identity commitment, time window, sumber attestasi, hasil contradiction report, dan aturan selective disclosure. Paket ini dapat dibayangkan sebagai artefak yang diteruskan ke platform atau mekanisme penyelesaian sengketa.');
+}
+function downloadCertificate(){
+ const data={certificate_id:document.getElementById('certId').textContent,identity_commitment:'did:key:z6Mk…A91',time_window:'20 Sep 2026 · 09:00–10:30',sources:'4 independent sources',status:'Review required',note:'Prototype demo — not a real cryptographic certificate.'};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kontinuum-certificate-demo.json';a.click();URL.revokeObjectURL(a.href);toast('Certificate demo diekspor.');
+}
+function toggleControl(btn,name){btn.classList.toggle('on');toast(name+(btn.classList.contains('on')?' diaktifkan.':' dinonaktifkan.'))}
+function editProfile(){
+ const n=prompt('Nama pengguna:',state.user);if(n===null)return;
+ const clean=n.trim();if(!clean)return;
+ state.user=clean;localStorage.setItem('kontinuum_user',clean);refreshUser();toast('Profil diperbarui.');
+}
+
+
+/* ================= ASSET SLOTS =================
+   Upload your own GitHub assets by replacing these two paths.
+   Example:
+   const ASSETS = {
+     logo: "assets/logo-kontinuum.svg",
+     mascot: "assets/maskot-konti.svg"
+   };
+================================================= */
+const ASSETS = {
+  // GitHub repository asset paths.
+  // Contoh struktur repo:
+  // /assets/logo-kontinuum.svg
+  // /assets/maskot-konti.svg
+  logo: "assets/logo-kontinuum.svg",
+  mascot: "assets/maskot-konti.svg"
+};
+
+function loadAssets(){
+  const logoEls = [
+    document.getElementById('continuumLogo'),
+    document.querySelector('.brand-logo-slot'),
+    document.querySelector('.mini-logo-placeholder'),
+    document.querySelector('.cert-logo-slot')
+  ];
+  const mascotEls = [
+    document.getElementById('continuumMascot'),
+    document.getElementById('dashboardMascot')
+  ];
+
+  if(ASSETS.logo){
+    logoEls.forEach(el=>{
+      if(!el) return;
+      if(el.tagName==='IMG'){el.src=ASSETS.logo; el.closest('.logo-slot')?.classList.add('has-image');}
+      else {el.innerHTML='<img src="'+ASSETS.logo+'" alt="Logo KONTINUUM">';}
+    });
+  }
+  if(ASSETS.mascot){
+    mascotEls.forEach(el=>{
+      if(!el) return;
+      el.src=ASSETS.mascot;
+      el.closest('.mascot-slot')?.classList.add('has-image');
+    });
+  }
+}
+
+/* Mobile-friendly navigation: every menu item also scrolls to the top */
+const originalTab = tab;
+tab = function(id,el){
+  originalTab(id,el);
+  document.querySelector('.main')?.scrollTo({top:0,behavior:'smooth'});
+};
+
+/* Click-outside handling for modal */
+document.getElementById('modal').addEventListener('touchend',e=>{
+  if(e.target.id==='modal') closeModal();
+});
+
+/* Enter key support for mobile/desktop forms */
+document.getElementById('claim')?.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==='Enter') generateReport();
+});
+
+loadAssets();
+
+init();
+</script>
+</body>
+</html>
